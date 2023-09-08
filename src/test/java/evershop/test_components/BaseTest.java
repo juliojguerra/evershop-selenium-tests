@@ -2,8 +2,11 @@ package evershop.test_components;
 
 import com.github.javafaker.Faker;
 import evershop.page_objects.HomePage;
+import evershop.resources.ConfigurationReader;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.AfterMethod;
@@ -18,39 +21,33 @@ public class BaseTest {
     public WebDriver driver;
     public HomePage homePage;
     public WebDriver initializeDriver() throws IOException {
-        String browserName = getProp().getProperty("browser");
 
-        if (browserName.equalsIgnoreCase("chrome")) {
-            // Make it run headless
-            // ChromeOptions options = new ChromeOptions();
-            // WebDriverManager.chromedriver().setup();
-            // options.addArguments("headless");
+        String browserName = ConfigurationReader.getProperty("browser");
+        WebDriver driver;
 
-            System.setProperty("webdriver.chrome.driver", "/Users/julioguerra/Documents/chromedriver/chromedriver");
-            driver = new ChromeDriver();
-        } else if (browserName.equalsIgnoreCase("firefox")) {
-            driver = new FirefoxDriver();
-        } else if (browserName.equalsIgnoreCase("edge")) {
-            driver = new EdgeDriver();
+        // Use WebDriverManager to manage WebDriver executable
+        switch (browserName.toLowerCase()) {
+            case "chrome" -> {
+                WebDriverManager.chromedriver().setup();
+                ChromeOptions chromeOptions = new ChromeOptions();
+                // Uncomment for headless mode
+                // chromeOptions.addArguments("headless");
+                driver = new ChromeDriver(chromeOptions);
+            }
+            case "firefox" -> {
+                WebDriverManager.firefoxdriver().setup();
+                driver = new FirefoxDriver();
+            }
+            case "edge" -> {
+                WebDriverManager.edgedriver().setup();
+                driver = new EdgeDriver();
+            }
+            default -> throw new IllegalArgumentException("Unsupported browser: " + browserName);
         }
 
         driver.manage().window().maximize();
 
-        // Add implicit wait
-        // driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-
         return driver;
-    }
-
-    public Properties getProp() throws IOException {
-        Properties prop = new Properties();
-
-        // Send properties file path (dinamically get the user dir path)
-        FileInputStream fis = new FileInputStream(System.getProperty("user.dir")+"/src/main/java/evershop/resources/config.properties");
-        // Load file
-        prop.load(fis);
-
-        return prop;
     }
 
     public String getRandomEmail() {
@@ -63,7 +60,7 @@ public class BaseTest {
     public HomePage launchApplication() throws IOException {
         driver = initializeDriver();
         homePage = new HomePage(driver);
-        driver.get(getProp().getProperty("baseURL"));
+        homePage.goTo();
 
         return homePage;
     }

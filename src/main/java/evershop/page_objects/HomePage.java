@@ -1,6 +1,7 @@
 package evershop.page_objects;
 
 import evershop.base_components.BaseComponent;
+import evershop.resources.ConfigurationReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -26,7 +27,8 @@ public class HomePage extends BaseComponent {
     }
 
     public void goTo(){
-        driver.get("https://demo.evershop.io/");
+        String baseURL = ConfigurationReader.getProperty("baseURL");
+        driver.get(baseURL);
     }
 
 
