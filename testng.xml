@@ -1,0 +1,7 @@
+<suite name="EvershopTestSuite">
+    <test name="Create Order Test">
+        <classes>
+            <class name="evershop.tests.CreateOrderTest" />
+        </classes>
+    </test>
+</suite>
