@@ -7,7 +7,9 @@ import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CreateOrderTest extends BaseTest {
@@ -30,65 +32,50 @@ public class CreateOrderTest extends BaseTest {
 
         loginPage.login(data.get("email"), data.get("password"));
 
-        // Search Men products
-        homePage.clickOnMenSection();
+        homePage.visitMenSection();
 
         ProductsPage productsPage = new ProductsPage(driver);
         productsPage.selectProduct(data.get("productName1"));
 
         ProductDetailPage productDetailPage = new ProductDetailPage(driver);
 
+        // Assert popup window
         softAssert.assertTrue(productDetailPage.getProductTitle().equalsIgnoreCase(data.get("productName1")));
 
         productDetailPage.setQuantity(data.get("product1Qty"));
-
         productDetailPage.selectRandomSizeAndColor();
-
         productDetailPage.addProductToCart();
 
-        // Assert popup window
         softAssert.assertTrue(productDetailPage.getWindowTitle().equalsIgnoreCase("Just added to your cart"), "Error: Toast Window not present");
 
-        // Search Men products
-        productDetailPage.clickOnMenSection();
-
+        productDetailPage.visitMenSection();
         productsPage.selectProduct(data.get("productName2"));
 
+        // Assert popup window
         softAssert.assertTrue(productDetailPage.getProductTitle().equalsIgnoreCase(data.get("productName2")));
 
         productDetailPage.setQuantity(data.get("product2Qty"));
 
-        // Select variants
         productDetailPage.selectRandomSizeAndColor();
-
-        // Add to cart
         productDetailPage.addProductToCart();
 
-        // Assert popup window
         softAssert.assertTrue(productDetailPage.getWindowTitle().equalsIgnoreCase("Just added to your cart"));
 
-        // Search Men products
-        productDetailPage.clickOnMenSection();
+        productDetailPage.visitMenSection();
 
         productsPage.selectProduct(data.get("productName3"));
 
         softAssert.assertTrue(productDetailPage.getProductTitle().equalsIgnoreCase(data.get("productName3")));
 
         productDetailPage.setQuantity(data.get("product3Qty"));
-
-        // Select variants
         productDetailPage.selectRandomSizeAndColor();
-
-        // Add to cart
         productDetailPage.addProductToCart();
 
         // Assert popup window
         softAssert.assertTrue(productDetailPage.getWindowTitle().equalsIgnoreCase("Just added to your cart"));
 
-        // Click on view cart
         productDetailPage.clickOnViewCart();
 
-        // Cart page
         CartPage cartPage = new CartPage(driver);
         cartPage.clickOnCheckout();
 
@@ -105,22 +92,17 @@ public class CreateOrderTest extends BaseTest {
 
         softAssert.assertTrue(checkoutPage.getStandardDeliveryRadioButton().isDisplayed(), "Radio button was not checked");
 
-        // Submit form (continue to payment)
         checkoutPage.submitForm();
 
-        // Payment page
         PaymentPage paymentPage = new PaymentPage(driver);
         paymentPage.selectVisaPayment();
-
         paymentPage.fillVisaCardDetails();
-
-        // Submit Payment form
         paymentPage.submitPaymentForm();
 
-        // Checkout success
         SuccessCheckoutPage successCheckoutPage = new SuccessCheckoutPage(driver);
         Map<String, String> orderInfo = successCheckoutPage.getOrderInformation();
 
+        // Assert Billing, Shipping and Contact information
         softAssert.assertTrue(data.get("streetAddress")
                 .equalsIgnoreCase(orderInfo.get("Order-ShippingStreetAddress")),
                 "Order Shipping Street Address is not correct");
@@ -145,11 +127,20 @@ public class CreateOrderTest extends BaseTest {
                 .equalsIgnoreCase(orderInfo.get("Order-BillingPostCode")),
                 "Order Postcode is not correct");
 
-        // Pending to assert items
+        // Assert product items
+        List<String> orderProductNames = getProductsList(orderInfo);
+
+        softAssert.assertTrue(orderProductNames.contains(data.get("productName1")),
+                data.get("productName1") + "is not present in Success page");
+        softAssert.assertTrue(orderProductNames.contains(data.get("productName2")),
+                data.get("productName2") + "product is not present in Success page");
+        softAssert.assertTrue(orderProductNames.contains(data.get("productName3")),
+                data.get("productName3") + "product is not present in Success page");
+
         softAssert.assertAll();
     }
 
-    // To move it later into a JSON
+    // Pending to move this test data into a JSON
     @DataProvider
     public Object[][] getData() {
         return new Object[][] {

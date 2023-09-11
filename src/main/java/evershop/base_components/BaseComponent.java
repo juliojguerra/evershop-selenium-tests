@@ -31,7 +31,7 @@ public class BaseComponent {
         wait.until(ExpectedConditions.visibilityOfElementLocated(findBy));
     }
 
-    public void clickOnMenSection(){
+    public void visitMenSection(){
         menLink.click();
     }
 }
