@@ -29,6 +29,8 @@ public class SuccessCheckoutPage extends BaseComponent {
     WebElement billingStreetAddress;
     @FindBy(xpath = "(//div[@class='city-province-postcode'])[2]/div[1]")
     WebElement billingPostCode;
+    @FindBy(xpath = "//table[@class='listing items-table']//span[@class='font-semibold']")
+    List<WebElement> productsElements;
     WebDriver driver;
     public SuccessCheckoutPage(WebDriver driver){
         super(driver);
@@ -42,7 +44,6 @@ public class SuccessCheckoutPage extends BaseComponent {
         Map<String, String> orderInfo = new HashMap<>();
 
         // Contact Information
-        // WebElement contactInfoEmailElement = contactInformationEmail;
         orderInfo.put("Order-Email", contactInformationEmail.getText());
 
         // Payment Information
@@ -59,7 +60,12 @@ public class SuccessCheckoutPage extends BaseComponent {
         orderInfo.put("Order-BillingStreetAddress", billingStreetAddress.getText());
         orderInfo.put("Order-BillingPostCode", billingPostCode.getText().split(",")[0]);
 
-        // System.out.println("Order info -> " + orderInfo);
+        // Add and enumerate item names
+        for (int i = 0; i < productsElements.size(); i++) {
+            WebElement product = productsElements.get(i);
+            orderInfo.put("Order-ProductName" + (i + 1), product.getText());
+        }
+
         return orderInfo;
     }
 }
