@@ -12,13 +12,10 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 public class BaseTest {
     public WebDriver driver;
@@ -40,6 +37,7 @@ public class BaseTest {
             case "firefox" -> {
                 WebDriverManager.firefoxdriver().setup();
                 driver = new FirefoxDriver();
+
             }
             case "edge" -> {
                 WebDriverManager.edgedriver().setup();
@@ -80,7 +78,16 @@ public class BaseTest {
 
     @AfterMethod(alwaysRun = true)
     public void tearDown() {
-        driver.close();
-        driver.quit();
+        try {
+            driver.close();
+        } catch (Exception e) {
+            System.out.println("driver.close() error");
+        }
+
+        try {
+            driver.quit();
+        } catch (Exception e) {
+            System.out.println("driver.quit() error");
+        }
     }
 }
