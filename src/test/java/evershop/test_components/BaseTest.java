@@ -15,6 +15,9 @@ import org.testng.annotations.BeforeMethod;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class BaseTest {
@@ -54,6 +57,16 @@ public class BaseTest {
         Faker faker = new Faker();
 
         return faker.internet().emailAddress();
+    }
+
+    public List<String> getProductsList(Map<String, String> orderInfo){
+        List<String> orderProductNames = new ArrayList<String>();
+
+        orderProductNames.add(orderInfo.get("Order-ProductName1"));
+        orderProductNames.add(orderInfo.get("Order-ProductName2"));
+        orderProductNames.add(orderInfo.get("Order-ProductName3"));
+
+        return orderProductNames;
     }
 
     @BeforeMethod(alwaysRun = true)
